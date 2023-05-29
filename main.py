@@ -92,3 +92,11 @@ if errorList:
 print("\nACTION table:")
 print(combined_table)
 
+from compilado import current_token,has_next_token
+
+inicio = 0
+file = 'input1.txt'
+while has_next_token(inicio,file):
+    token,new_inicio = current_token(inicio,file)
+    print(token)
+    inicio = new_inicio
