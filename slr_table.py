@@ -54,4 +54,4 @@ def generate_slr_tables(states, transitions, productions, first_sets, follow_set
     combined_table = pd.concat([action_table, goto_table], axis=1)
     combined_table = combined_table.drop(combined_table.index[- 1])
 
-    return combined_table, errorList
+    return combined_table, errorList,production_list

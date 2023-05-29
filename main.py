@@ -80,7 +80,7 @@ follow = follow_sets(converted_prod, first)
 from slr_table import generate_slr_tables
 
 
-combined_table,errorList = generate_slr_tables(states, transitions, converted_prod, first, follow,nonTerminals,Terminals)
+combined_table,errorList,production_list = generate_slr_tables(states, transitions, converted_prod, first, follow,nonTerminals,Terminals)
 
 if errorList:
     print(CRED,"Error stack:")
@@ -91,12 +91,91 @@ if errorList:
 
 print("\nACTION table:")
 print(combined_table)
+def remove_quotes(token):
+    if token[0] == "'" and token[-1] == "'":
+        return token[1:-1]
+    return token
+
+# Use the function before using the token in the analysis
+token = remove_quotes(token)
 
 from compilado import current_token,has_next_token
+import pandas as pd
 
 inicio = 0
 file = 'input1.txt'
-while has_next_token(inicio,file):
-    token,new_inicio = current_token(inicio,file)
-    print(token)
-    inicio = new_inicio
+def parse_lr(input_file, combined_table, states, transitions, production_list):
+    # Initiate
+    stack = [0]
+    index = 0
+    error_list = []
+    parse_result = []
+    
+    file = input_file
+    while has_next_token(index, file):
+        token, new_index = current_token(index, file)
+        token = remove_quotes(token)  # Remove extra quotes
+        index = new_index
+        if token not in ignored:
+            while True:
+                state = stack[-1]
+                action = combined_table.loc[state, token]
+                
+                if pd.isna(action):
+                    error_list.append(f"Unexpected token '{token}' at index {index}.")
+                    break
+                
+                if action == "ACCEPT":
+                    parse_result.append("ACCEPT")
+                    break
+                
+                elif action.startswith("S"):
+                    next_state = int(action.split()[1])
+                    stack.append(next_state)
+                    break
+                
+                elif action.startswith("R"):
+                    production_index = int(action.split()[1])
+                    production = production_list[production_index]  # Get the corresponding production
+                    A, β = production
+                    
+                    # Pop |β| states
+                    for _ in range(len(β)):
+                        if stack:
+                            stack.pop()
+                        else:
+                            error_list.append(f"Unexpected end of stack when processing token '{token}' at index {index}.")
+                            break
+                    
+                    # Let state t now be on the top of the stack
+                    t = stack[-1] if stack else None
+                    if t is not None:
+                        # Push goto[t, A] onto the stack
+                        goto = combined_table.loc[t, A]
+                        if pd.notna(goto):
+                            stack.append(int(goto))
+                        else:
+                            error_list.append(f"Error: GOTO[{t},{A}] is undefined.")
+                            break
+                    else:
+                        error_list.append(f"Error: Stack is empty when trying to GOTO[{A}].")
+                        break
+                        
+                    # Output the production
+                    parse_result.append(production)
+                    
+                else:
+                    error_list.append(f"Unexpected action '{action}' for token '{token}' at index {index}.")
+                    break
+            
+    return parse_result, error_list
+
+parse_result, error_list =  parse_lr(file, combined_table, states, transitions, production_list)
+if error_list:
+    print("\nErrors encountered:")
+    for err in error_list:
+        print(err)
+
+print("\nParse result:")
+for prod in parse_result:
+    print(prod)
