@@ -2,7 +2,6 @@
 from yapl import *
 from yalex import *
 
-
 CEND = '\33[0m'
 CRED = '\33[91m'
 CYELLOW = '\33[93m'
@@ -59,28 +58,13 @@ if errorStack:
     exit()
 
 converted_productions = convert_productions(productions_dict)
-# productions = [(nt, rule) for nt, rules in productions_dict.items() for rule in rules]
-print("----------------------")
-print(converted_productions)
-print("----------------------")
 
 nonTerminals = list(productions_dict.keys())
 Terminals = tokens
-print(converted_productions)
 states, transitions = canonical_collection(converted_productions,nonTerminals,Terminals)
 
-print('Estados:')
-for i, state in enumerate(states):
-    print(f'{i}: {state}')
-
-print('Transiciones:')
-for transition in transitions:
-    print(transition)
-# Ejemplo de uso:
 
 visualize_lr0(states, transitions)
-
-# print("\n------------LL----------\n\n")
 
 def convert_productions(productions):
     converted_productions = {}
@@ -88,7 +72,6 @@ def convert_productions(productions):
         converted_productions[key] = [prod.split() for prod in value]
     return converted_productions
 
-# print(productions_dict)
 converted_prod = convert_productions(productions_dict)
 first = first_sets(converted_prod)
 follow = follow_sets(converted_prod, first)

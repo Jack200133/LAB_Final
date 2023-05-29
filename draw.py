@@ -29,5 +29,5 @@ def visualize_lr0(states, transitions):
 
         # Generar y guardar el gráfico como imagen PNG
     dot.render("lr0_automaton", cleanup=True)
-    print("Gráfico del autómata LR(0) generado como 'lr0_automaton.png'")
+    #print("Gráfico del autómata LR(0) generado como 'lr0_automaton.png'")
 

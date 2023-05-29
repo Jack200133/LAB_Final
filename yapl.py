@@ -23,12 +23,20 @@ def split_sections(content):
 
 def process_tokens_section(content):
     tokens = []
+    ignored =[]
     lines = content.split('\n')
     for line in lines:
         if line.startswith("%token"):
             line_tokens = line[len("%token"):].strip().split(' ')
             tokens.extend(line_tokens)
-    return tokens
+        if line.startswith("IGNORE"):
+            line_tokens = line[len("IGNORE"):].strip().split(' ')
+            # Borrar los tokens ignorados
+            for token in line_tokens:
+                if token in tokens:
+                    tokens.remove(token)
+            ignored.extend(line_tokens)
+    return tokens,ignored
 
 def process_productions_section(content):
     productions = {}
@@ -99,12 +107,12 @@ def parse_yalp_file(filename,error_stack):
     if(divisionError):
         error_stack.extend(divisionError)
     else:
-        tokens = process_tokens_section(tokens_section)
+        tokens,ignored = process_tokens_section(tokens_section)
         productions = process_productions_section(productions_section)
 
         error_stack.extend(validate_yalp(tokens_section, productions_section, tokens, productions))
 
-    return tokens, productions,error_stack
+    return tokens, productions,error_stack,ignored
 
 def convert_productions(productions_dict):
     converted_productions = {}
