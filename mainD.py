@@ -84,13 +84,13 @@ import pickle
 final_bits = pickle.dumps(final_automaton)
 tokens_bits = pickle.dumps(tokens_states)
 
-with open('final_automatonD.pickle', 'wb') as f:
+with open('pickle/final_automatonD.pickle', 'wb') as f:
     f.write(final_bits)
 
-with open('tokens_statesD.pickle', 'wb') as f:
+with open('pickle/tokens_statesD.pickle', 'wb') as f:
     f.write(tokens_bits)
 
-with open('tokensD.pickle', 'wb') as f:
+with open('pickle/tokensD.pickle', 'wb') as f:
     f.write(pickle.dumps(tokens))
 
 imports = '''
@@ -107,13 +107,13 @@ CGREEM = '\\33[92m'
 CBLUE = '\\33[94m'
 
 #cargar bites del automata
-with open('final_automatonD.pickle', 'rb') as f:
+with open('pickle/final_automatonD.pickle', 'rb') as f:
     final_automaton = pickle.load(f)
 
-with open('tokens_statesD.pickle', 'rb') as f:
+with open('pickle/tokens_statesD.pickle', 'rb') as f:
     tokens_states = pickle.load(f)
 
-with open('tokensD.pickle', 'rb') as f:
+with open('pickle/tokensD.pickle', 'rb') as f:
     tokens = pickle.load(f)
 
 print(CYELLOW)

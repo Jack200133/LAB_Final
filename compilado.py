@@ -10,13 +10,13 @@ CGREEM = '\33[92m'
 CBLUE = '\33[94m'
 
 #cargar bites del automata
-with open('final_automatonD.pickle', 'rb') as f:
+with open('pickle/final_automatonD.pickle', 'rb') as f:
     final_automaton = pickle.load(f)
 
-with open('tokens_statesD.pickle', 'rb') as f:
+with open('pickle/tokens_statesD.pickle', 'rb') as f:
     tokens_states = pickle.load(f)
 
-with open('tokensD.pickle', 'rb') as f:
+with open('pickle/tokensD.pickle', 'rb') as f:
     tokens = pickle.load(f)
 
 print(CYELLOW)
@@ -101,8 +101,7 @@ def current_tok(input_w,file):
                     accepted_priority = float('inf')
                 else:
                     errorS = current_word if len(accepted_word) == 0 else accepted_word
-                    print(CRED,errorS, current_word, accepted_word)
-                    print(CRED, '1Error en el caracter:', errorS, ", en la línea:", line_count, CGREEM, '\n')
+                    print(CRED, 'Error en el caracter:', errorS, ", en la línea:", line_count, CGREEM, '\n')
                     input_w += 1
                     current_word = ''
                     accepted_word = ''
@@ -143,7 +142,7 @@ def current_tok(input_w,file):
                 accepted_priority = float('inf')       
             else:
                 errorS = current_word if len(accepted_word) == 0 else accepted_word
-                print(CRED, '2Error en el caracter:', errorS, ", en la línea:", line_count, CGREEM, '\n')
+                print(CRED, 'Error en el caracter:', errorS, ", en la línea:", line_count, CGREEM, '\n')
                 input_w += 1
                 current_word = '' 
                 accepted_word = ''

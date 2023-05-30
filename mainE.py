@@ -94,7 +94,7 @@ first = first_sets(converted_prod)
 follow = follow_sets(converted_prod, first)
 
 
-from slr_table import generate_slr_tables
+from SLRtable import generate_slr_tables
 
 
 combined_table,errorList = generate_slr_tables(states, transitions, converted_prod, first, follow,nonTerminals,Terminals)

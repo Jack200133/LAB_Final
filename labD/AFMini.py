@@ -111,6 +111,4 @@ def build_miniAFD(afd,start):
 
     miniAFD["transition_function"] = cleanTransitions
 
-    with open('AFDM.json', 'w') as file:
-        json.dump(afd, file, indent=4)
     return miniAFD
