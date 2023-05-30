@@ -137,7 +137,7 @@ space_map = {
 
 
 input_w = 0
-def current_token(input_w,file):
+def current_tok(input_w,file):
     input_content = Content(file)
     accepted_word = ''
     accepted_priority = float('inf')
