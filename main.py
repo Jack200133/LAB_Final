@@ -80,7 +80,7 @@ follow = follow_sets(converted_prod, first)
 from slr_table import generate_slr_tables
 
 
-combined_table,errorList,production_list = generate_slr_tables(states, transitions, converted_prod, first, follow,nonTerminals,Terminals)
+combined_table,errorList,production_list,action_table, goto_table = generate_slr_tables(states, transitions, converted_prod, first, follow,nonTerminals,Terminals)
 
 if errorList:
     print(CRED,"Error stack:")
@@ -99,83 +99,75 @@ def remove_quotes(token):
 # Use the function before using the token in the analysis
 token = remove_quotes(token)
 
-from compilado import current_token,has_next_token
+from compilado import current_tok,has_next_token
 import pandas as pd
 
 inicio = 0
 file = 'input1.txt'
-def parse_lr(input_file, combined_table, states, transitions, production_list):
-    # Initiate
-    stack = [0]
-    index = 0
-    error_list = []
-    parse_result = []
-    
-    file = input_file
-    while has_next_token(index, file):
-        token, new_index = current_token(index, file)
-        token = remove_quotes(token)  # Remove extra quotes
-        index = new_index
-        if token not in ignored:
-            while True:
-                state = stack[-1]
-                action = combined_table.loc[state, token]
-                
-                if pd.isna(action):
-                    error_list.append(f"Unexpected token '{token}' at index {index}.")
-                    break
-                
-                if action == "ACCEPT":
-                    parse_result.append("ACCEPT")
-                    break
-                
-                elif action.startswith("S"):
-                    next_state = int(action.split()[1])
-                    stack.append(next_state)
-                    break
-                
-                elif action.startswith("R"):
-                    production_index = int(action.split()[1])
-                    production = production_list[production_index]  # Get the corresponding production
-                    A, β = production
-                    
-                    # Pop |β| states
-                    for _ in range(len(β)):
-                        if stack:
-                            stack.pop()
-                        else:
-                            error_list.append(f"Unexpected end of stack when processing token '{token}' at index {index}.")
-                            break
-                    
-                    # Let state t now be on the top of the stack
-                    t = stack[-1] if stack else None
-                    if t is not None:
-                        # Push goto[t, A] onto the stack
-                        goto = combined_table.loc[t, A]
-                        if pd.notna(goto):
-                            stack.append(int(goto))
-                        else:
-                            error_list.append(f"Error: GOTO[{t},{A}] is undefined.")
-                            break
-                    else:
-                        error_list.append(f"Error: Stack is empty when trying to GOTO[{A}].")
-                        break
-                        
-                    # Output the production
-                    parse_result.append(production)
-                    
-                else:
-                    error_list.append(f"Unexpected action '{action}' for token '{token}' at index {index}.")
-                    break
+def parse_slr(file_name, action_table, goto_table, production_list):
+    parse_stack = [0]  # Pila inicial con el estado 0
+    input_index = 0  # Índice para rastrear el token actual en input_tokens
+    current_token, input_index = current_tok(input_index, file_name)
+    current_token = remove_quotes(current_token)
+    while True:
+        if current_token in ignored:
+            if has_next_token(input_index, file_name):
+                current_token, input_index = current_tok(input_index, file_name)
+                current_token = remove_quotes(current_token)
+            else:
+                current_token = '$'
+            continue
+        current_state = parse_stack[-1]
+
+        action = action_table.loc[current_state, current_token]
+
+        print("ESTADO :", current_state)
+        print("TOKEN  :", current_token)
+        print("ACCION :", action)
+
+        if action.startswith('S'):
+            # Desplazamiento (shift)
+            next_state = int(action[1:])
+            parse_stack.append(current_token)
+            parse_stack.append(next_state)
+            # Obteniendo el token actual
+            if has_next_token(input_index, file_name):
+                current_token, input_index = current_tok(input_index, file_name)
+                current_token = remove_quotes(current_token)
+            else:
+                current_token = '$'
             
-    return parse_result, error_list
+            
 
-parse_result, error_list =  parse_lr(file, combined_table, states, transitions, production_list)
-if error_list:
-    print("\nErrors encountered:")
-    for err in error_list:
-        print(err)
+        elif action.startswith('R'):
+            # Reducción (reduce)
+            production_num = int(action[1:])
+            production = production_list[production_num]
+            lhs, rhs = production
 
-print("\nParse result:")
-for prod in parse_result:
-    print(prod)
+            # Desapilar símbolos
+            num_symbols = len(rhs)
+            parse_stack = parse_stack[:-2 * num_symbols]
+
+            # Obtener el estado actual después de la reducción
+            current_state = parse_stack[-1]
+            next_state = goto_table.loc[current_state, lhs]
+
+            parse_stack.append(lhs)
+            parse_stack.append(next_state)
+        elif action == 'ACCEPT':
+            # Análisis completado
+            print('\nLa cadena de entrada es válida.')
+            break
+        else:
+            # Error sintáctico
+            print('\nError sintáctico: la cadena de entrada no es válida.')
+            break
+
+# file_path = input("\nQue archivo de texto deseamos evaluar? -> ")
+file_path = 'input1.txt'
+with open("input/input1.txt", 'r') as file:
+    content = file.read()
+    input_tokens = content.split()  # Dividir el contenido en palabras
+
+parse_slr(file_path, action_table, goto_table, production_list)

@@ -47,11 +47,11 @@ def generate_slr_tables(states, transitions, productions, first_sets, follow_set
                     goto_table.loc[i, trans[1]] = trans[2]
 
     # Reemplazar NaNs por " "
-    action_table = action_table.fillna("-")
-    goto_table = goto_table.fillna("-")
+    #action_table = action_table.fillna("-")
+    #goto_table = goto_table.fillna("-")
 
     # Combina las tablas de acción y GOTO en una tabla
     combined_table = pd.concat([action_table, goto_table], axis=1)
     combined_table = combined_table.drop(combined_table.index[- 1])
 
-    return combined_table, errorList,production_list
+    return combined_table, errorList,production_list, action_table, goto_table
