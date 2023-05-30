@@ -101,7 +101,8 @@ def current_tok(input_w,file):
                     accepted_priority = float('inf')
                 else:
                     errorS = current_word if len(accepted_word) == 0 else accepted_word
-                    print(CRED, 'Error en el caracter:', errorS, ", en la línea:", line_count, CGREEM, '\n')
+                    print(CRED,errorS, current_word, accepted_word)
+                    print(CRED, '1Error en el caracter:', errorS, ", en la línea:", line_count, CGREEM, '\n')
                     input_w += 1
                     current_word = ''
                     accepted_word = ''
@@ -142,7 +143,7 @@ def current_tok(input_w,file):
                 accepted_priority = float('inf')       
             else:
                 errorS = current_word if len(accepted_word) == 0 else accepted_word
-                print(CRED, 'Error en el caracter:', errorS, ", en la línea:", line_count, CGREEM, '\n')
+                print(CRED, '2Error en el caracter:', errorS, ", en la línea:", line_count, CGREEM, '\n')
                 input_w += 1
                 current_word = '' 
                 accepted_word = ''
